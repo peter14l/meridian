@@ -3,6 +3,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.widget.RemoteViews
 import es.antonborri.home_widget.HomeWidgetPlugin
+import com.example.meridian.R
 
 class TaskWidgetProvider : AppWidgetProvider() {
     override fun onUpdate(

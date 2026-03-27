@@ -1,0 +1,25 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../data/services/supabase_service.dart';
+
+final authStateProvider = StreamProvider<AuthState>((ref) {
+  return SupabaseService.client.auth.onAuthStateChange;
+});
+
+final authControllerProvider = Provider((ref) => AuthController());
+
+class AuthController {
+  final SupabaseClient _client = SupabaseService.client;
+
+  Future<void> signInWithEmail(String email, String password) async {
+    await _client.auth.signInWithPassword(email: email, password: password);
+  }
+
+  Future<void> signUpWithEmail(String email, String password) async {
+    await _client.auth.signUp(email: email, password: password);
+  }
+
+  Future<void> signOut() async {
+    await _client.auth.signOut();
+  }
+}

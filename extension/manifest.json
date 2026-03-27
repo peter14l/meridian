@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "Meridian Smart Capture",
+  "version": "1.0",
+  "description": "One-click save current URL to Meridian.",
+  "permissions": ["activeTab", "storage"],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}

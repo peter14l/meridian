@@ -17,8 +17,8 @@ class GlowCard extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final outerGlowColor = isDark 
-        ? const Color(0xFF818CF8).withOpacity(0.4) 
-        : const Color(0xFF6366F1).withOpacity(0.25);
+        ? const Color(0xFF818CF8).withValues(alpha: 0.4) 
+        : const Color(0xFF6366F1).withValues(alpha: 0.25);
         
     final gradientStart = isDark ? const Color(0xFF818CF8) : const Color(0xFF6366F1);
     final gradientEnd = isDark ? const Color(0xFFC084FC) : const Color(0xFFA855F7);
@@ -78,7 +78,7 @@ class GlowCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF6C63FF).withOpacity(0.2),
+                          color: const Color(0xFF6C63FF).withValues(alpha: 0.2),
                           blurRadius: 8,
                           spreadRadius: 0,
                           blurStyle: BlurStyle.inner,

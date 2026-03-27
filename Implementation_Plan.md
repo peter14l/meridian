@@ -34,36 +34,36 @@ We will create multiple components following a structured phased approach.
 ---
 
 ### Phase 3: MVP Polish & Launch (v1.0.0)
-- [ ] Integrate Google Calendar (Auth & event sync).
-- [ ] Refine micro-motion UI (Shared element transitions, spring bottom sheets).
-- [ ] Build Core Settings & Preferences (Dark/Light toggle, Notification prefs).
-- [ ] Set up Error Monitoring (Sentry) and Analytics (PostHog).
-- [ ] Configure GitHub Actions for CI/CD.
+- [x] Integrate Google Calendar (Auth & event sync).
+- [x] Refine micro-motion UI (Shared element transitions, spring bottom sheets).
+- [x] Build Core Settings & Preferences (Dark/Light toggle, Notification prefs).
+- [x] Set up Error Monitoring (Sentry) and Analytics (PostHog).
+- [x] Configure GitHub Actions for CI/CD.
 - [ ] Finalize Android App Bundle and deploy to Play Store.
 
 ---
 
 ### Phase 4: Secondary Core Features (v1.1.0)
-- [ ] Implement AI Study Session Planner algorithm and UI.
-- [ ] Add Pomodoro Timer with dynamic session tracking.
-- [ ] Build Smart Inbox (Read-only Gmail extraction for recruitment).
+- [x] Implement AI Study Session Planner algorithm and UI.
+- [x] Add Pomodoro Timer with dynamic session tracking.
+- [x] Build Smart Inbox (Read-only Gmail extraction for recruitment).
 - [ ] Finalize iOS bundle and deploy to App Store.
 
 ---
 
 ### Phase 5: Deepening Product Experience (v1.2.0 & v1.3.0)
-- [ ] Setup `resume_versions`, `study_groups`, `study_group_members` tables.
-- [ ] Build Weekly Review & AI Reflection cards.
-- [ ] Implement Resume Vault & AI matching logic.
-- [ ] Build Study Groups frontend & in-app messaging (Supabase Realtime).
+- [x] Setup `resume_versions`, `study_groups`, `study_group_members` tables.
+- [x] Build Weekly Review & AI Reflection cards.
+- [x] Implement Resume Vault & AI matching logic.
+- [x] Build Study Groups frontend & in-app messaging (Supabase Realtime).
 - [ ] Optimize and deploy Web App (Flutter Web).
 
 ---
 
 ### Phase 6: Advance Polish & Offline Mode (v1.4.0)
-- [ ] Develop Home/Lock Screen Widgets for next deadlines.
-- [ ] Implement robust Offline Mode with local-first sync.
-- [ ] Optimize performance and conduct application profiling.
+- [x] Develop Home/Lock Screen Widgets for next deadlines.
+- [x] Implement robust Offline Mode with local-first sync.
+- [x] Optimize performance and conduct application profiling.
 
 ---
 

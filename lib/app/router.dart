@@ -1,18 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:posthog_flutter/posthog_flutter.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import '../features/auth/auth_screen.dart';
 import '../features/auth/auth_controller.dart';
 import '../features/auth/onboarding_screen.dart';
 import '../features/tasks/tasks_screen.dart';
 import '../features/briefing/briefing_screen.dart';
 import '../features/jobs/jobs_screen.dart';
+import '../features/settings/settings_screen.dart';
+import '../features/study/study_screen.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
 
   return GoRouter(
     initialLocation: '/briefing',
+    observers: [
+      PosthogObserver(),
+      SentryNavigatorObserver(),
+    ],
     redirect: (context, state) {
       final isAuthenticated = authState.value?.session != null;
       final isAuthRoute = state.matchedLocation == '/auth';
@@ -40,6 +48,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             body: child,
             bottomNavigationBar: BottomNavigationBar(
               currentIndex: _calculateSelectedIndex(state.matchedLocation),
+              type: BottomNavigationBarType.fixed,
               onTap: (index) {
                 switch (index) {
                   case 0:
@@ -52,6 +61,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                     context.go('/jobs');
                     break;
                   case 3:
+                    context.go('/study');
+                    break;
+                  case 4:
                     context.go('/settings');
                     break;
                 }
@@ -62,6 +74,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                 BottomNavigationBarItem(icon: Icon(Icons.auto_awesome), label: 'Briefing'),
                 BottomNavigationBarItem(icon: Icon(Icons.check_box), label: 'Tasks'),
                 BottomNavigationBarItem(icon: Icon(Icons.work), label: 'Jobs'),
+                BottomNavigationBarItem(icon: Icon(Icons.school), label: 'Study'),
                 BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
               ],
             ),
@@ -81,8 +94,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const JobsScreen(),
           ),
           GoRoute(
+            path: '/study',
+            builder: (context, state) => const StudyScreen(),
+          ),
+          GoRoute(
             path: '/settings',
-            builder: (context, state) => const Center(child: Text('Settings')),
+            builder: (context, state) => const SettingsScreen(),
           ),
         ],
       ),
@@ -94,6 +111,7 @@ int _calculateSelectedIndex(String location) {
   if (location.startsWith('/briefing')) return 0;
   if (location.startsWith('/tasks')) return 1;
   if (location.startsWith('/jobs')) return 2;
-  if (location.startsWith('/settings')) return 3;
+  if (location.startsWith('/study')) return 3;
+  if (location.startsWith('/settings')) return 4;
   return 0;
 }

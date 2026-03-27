@@ -44,12 +44,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       ShellRoute(
         builder: (context, state, child) {
+          final theme = Theme.of(context);
           return Scaffold(
             body: child,
-            bottomNavigationBar: BottomNavigationBar(
-              currentIndex: _calculateSelectedIndex(state.matchedLocation),
-              type: BottomNavigationBarType.fixed,
-              onTap: (index) {
+            bottomNavigationBar: NavigationBar(
+              selectedIndex: _calculateSelectedIndex(state.matchedLocation),
+              indicatorColor: theme.colorScheme.primaryContainer,
+              labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+              onDestinationSelected: (index) {
                 switch (index) {
                   case 0:
                     context.go('/briefing');
@@ -68,14 +70,32 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                     break;
                 }
               },
-              unselectedItemColor: Colors.grey,
-              selectedItemColor: Theme.of(context).colorScheme.primary,
-              items: const [
-                BottomNavigationBarItem(icon: Icon(Icons.auto_awesome), label: 'Briefing'),
-                BottomNavigationBarItem(icon: Icon(Icons.check_box), label: 'Tasks'),
-                BottomNavigationBarItem(icon: Icon(Icons.work), label: 'Jobs'),
-                BottomNavigationBarItem(icon: Icon(Icons.school), label: 'Study'),
-                BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
+              destinations: const [
+                NavigationDestination(
+                  icon: Icon(Icons.auto_awesome_outlined),
+                  selectedIcon: Icon(Icons.auto_awesome),
+                  label: 'Briefing',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.check_box_outlined),
+                  selectedIcon: Icon(Icons.check_box),
+                  label: 'Tasks',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.work_outline_rounded),
+                  selectedIcon: Icon(Icons.work_rounded),
+                  label: 'Jobs',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.school_outlined),
+                  selectedIcon: Icon(Icons.school),
+                  label: 'Study',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.settings_outlined),
+                  selectedIcon: Icon(Icons.settings),
+                  label: 'Settings',
+                ),
               ],
             ),
           );

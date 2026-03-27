@@ -13,13 +13,18 @@ class TasksScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tasksAsync = ref.watch(tasksProvider);
+    final theme = Theme.of(context);
 
     return Scaffold(
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         title: Text(
           'Tasks',
-          style: Theme.of(context).textTheme.headlineLarge,
+          style: theme.textTheme.headlineLarge?.copyWith(
+            fontWeight: FontWeight.w800,
+          ),
         ),
+        centerTitle: false,
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -34,16 +39,31 @@ class TasksScreen extends ConsumerWidget {
             length: 3,
             child: Column(
               children: [
-                TabBar(
-                  labelColor: Theme.of(context).colorScheme.primary,
-                  unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
-                  indicatorColor: Theme.of(context).colorScheme.primary,
-                  indicatorSize: TabBarIndicatorSize.label,
-                  tabs: const [
-                    Tab(text: 'To Do'),
-                    Tab(text: 'Active'),
-                    Tab(text: 'Done'),
-                  ],
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surfaceContainer,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: TabBar(
+                      dividerColor: Colors.transparent,
+                      indicator: BoxDecoration(
+                        color: theme.colorScheme.primary,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      indicatorSize: TabBarIndicatorSize.tab,
+                      labelColor: theme.colorScheme.onPrimary,
+                      unselectedLabelColor: theme.colorScheme.onSurfaceVariant,
+                      labelStyle: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700),
+                      tabs: const [
+                        Tab(text: 'To Do'),
+                        Tab(text: 'Active'),
+                        Tab(text: 'Done'),
+                      ],
+                    ),
+                  ),
                 ),
                 Expanded(
                   child: TabBarView(
@@ -61,12 +81,12 @@ class TasksScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(child: Text('Error: $err')),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.large(
         onPressed: () => _showAddTaskSheet(context, ref),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: const Icon(Icons.add),
+        backgroundColor: theme.colorScheme.primary,
+        foregroundColor: theme.colorScheme.onPrimary,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)), // Extra-Large
+        child: const Icon(Icons.add_rounded, size: 32),
       ),
     );
   }
@@ -85,15 +105,16 @@ class TasksScreen extends ConsumerWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) {
+        final theme = Theme.of(context);
         return StatefulBuilder(
           builder: (context, setState) {
             return Container(
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                color: theme.colorScheme.surfaceContainerHigh,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
               ),
               padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 32,
                 left: 24,
                 right: 24,
                 top: 12,
@@ -104,42 +125,47 @@ class TasksScreen extends ConsumerWidget {
                 children: [
                   Center(
                     child: Container(
-                      width: 40,
-                      height: 4,
+                      width: 48,
+                      height: 6,
                       decoration: BoxDecoration(
-                        color: Theme.of(context).dividerColor,
-                        borderRadius: BorderRadius.circular(2),
+                        color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(3),
                       ),
                     ),
                   ),
+                  const SizedBox(height: 32),
+                  Text(
+                    'New Task', 
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    )
+                  ),
                   const SizedBox(height: 24),
-                  Text('New Task', style: Theme.of(context).textTheme.headlineMedium),
-                  const SizedBox(height: 16),
                   TextField(
                     controller: titleController,
                     autofocus: true,
-                    style: Theme.of(context).textTheme.bodyLarge,
+                    style: theme.textTheme.titleLarge,
                     decoration: InputDecoration(
                       hintText: 'What needs to be done?',
-                      hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
-                          ),
+                      hintStyle: theme.textTheme.titleLarge?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+                      ),
                       border: InputBorder.none,
                     ),
                   ),
                   TextField(
                     controller: descController,
-                    style: Theme.of(context).textTheme.bodyMedium,
+                    style: theme.textTheme.bodyLarge,
                     maxLines: 2,
                     decoration: InputDecoration(
                       hintText: 'Add description (optional)',
-                      hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
-                          ),
+                      hintStyle: theme.textTheme.bodyLarge?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
+                      ),
                       border: InputBorder.none,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 24),
                   Row(
                     children: [
                       _PriorityButton(
@@ -147,13 +173,13 @@ class TasksScreen extends ConsumerWidget {
                         isSelected: selectedPriority == 1,
                         onTap: () => setState(() => selectedPriority = 1),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 12),
                       _PriorityButton(
                         priority: 2,
                         isSelected: selectedPriority == 2,
                         onTap: () => setState(() => selectedPriority = 2),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 12),
                       _PriorityButton(
                         priority: 3,
                         isSelected: selectedPriority == 3,
@@ -161,7 +187,7 @@ class TasksScreen extends ConsumerWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 40),
                   MeridianButton(
                     label: 'Create Task',
                     onPressed: () {
@@ -202,16 +228,23 @@ class _TaskList extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.task_alt,
-              size: 64,
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainer,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.task_alt_rounded,
+                size: 48,
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+              ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             Text(
               'All clear for now',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
             ),
           ],
@@ -225,7 +258,7 @@ class _TaskList extends ConsumerWidget {
       itemBuilder: (context, index) {
         final task = tasks[index];
         return Padding(
-          padding: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.only(bottom: 16),
           child: TaskCard(
             task: task,
             onStatusChanged: (newStatus) {
@@ -256,42 +289,49 @@ class _PriorityButton extends StatelessWidget {
     String label;
     switch (priority) {
       case 1:
-        color = const Color(0xFFFF6B6B);
+        color = theme.colorScheme.error;
         label = 'High';
         break;
       case 2:
-        color = const Color(0xFFFBBF24);
+        color = Colors.orangeAccent;
         label = 'Medium';
         break;
       default:
-        color = Colors.blueGrey;
+        color = theme.colorScheme.onSurfaceVariant;
         label = 'Low';
     }
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? color.withValues(alpha: 0.2) : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
+          color: isSelected ? color.withValues(alpha: 0.15) : theme.colorScheme.surfaceContainer,
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? color : theme.dividerColor,
+            color: isSelected ? color : Colors.transparent,
+            width: 2,
           ),
         ),
         child: Row(
           children: [
             Container(
-              width: 8,
-              height: 8,
-              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                color: color, 
+                shape: BoxShape.circle,
+                boxShadow: isSelected ? [
+                  BoxShadow(color: color.withValues(alpha: 0.4), blurRadius: 4)
+                ] : null,
+              ),
             ),
-            const SizedBox(width: 6),
+            const SizedBox(width: 8),
             Text(
               label,
-              style: theme.textTheme.labelMedium?.copyWith(
-                color: isSelected ? color : theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              style: theme.textTheme.labelLarge?.copyWith(
+                color: isSelected ? color : theme.colorScheme.onSurfaceVariant,
+                fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
               ),
             ),
           ],

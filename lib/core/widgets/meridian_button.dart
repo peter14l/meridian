@@ -31,10 +31,14 @@ class _MeridianButtonState extends State<MeridianButton> with SingleTickerProvid
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 150),
+      duration: const Duration(milliseconds: 200),
     );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.97).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    // Spring Physics-like effect
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const ElasticOutCurve(0.8), // Expressive Spring
+      ),
     );
   }
 
@@ -65,29 +69,36 @@ class _MeridianButtonState extends State<MeridianButton> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    Color backgroundColor;
-    Color foregroundColor;
-
+    
+    ButtonStyle buttonStyle;
+    
     switch (widget.variant) {
       case MeridianButtonVariant.primary:
-        backgroundColor = theme.colorScheme.primary;
-        foregroundColor = theme.colorScheme.onPrimary;
+        buttonStyle = FilledButton.styleFrom(
+          backgroundColor: theme.colorScheme.primary,
+          foregroundColor: theme.colorScheme.onPrimary,
+          minimumSize: const Size.fromHeight(56),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)), // Large
+          textStyle: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700),
+        );
         break;
       case MeridianButtonVariant.secondary:
-        backgroundColor = isDark ? const Color(0xFF3D3580) : const Color(0xFFEAE8FF);
-        foregroundColor = isDark ? Colors.white : theme.colorScheme.primary;
+        buttonStyle = FilledButton.styleFrom(
+          backgroundColor: theme.colorScheme.secondaryContainer,
+          foregroundColor: theme.colorScheme.onSecondaryContainer,
+          minimumSize: const Size.fromHeight(56),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)), // Large
+          textStyle: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700),
+        );
         break;
       case MeridianButtonVariant.ghost:
-        backgroundColor = Colors.transparent;
-        foregroundColor = theme.colorScheme.primary;
+        buttonStyle = TextButton.styleFrom(
+          foregroundColor: theme.colorScheme.primary,
+          minimumSize: const Size.fromHeight(56),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)), // Large
+          textStyle: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700),
+        );
         break;
-    }
-
-    if (widget.onPressed == null) {
-      backgroundColor = backgroundColor.withValues(alpha: 0.5);
-      foregroundColor = foregroundColor.withValues(alpha: 0.5);
     }
 
     return GestureDetector(
@@ -97,41 +108,41 @@ class _MeridianButtonState extends State<MeridianButton> with SingleTickerProvid
       onTap: widget.isLoading ? null : widget.onPressed,
       child: ScaleTransition(
         scale: _scaleAnimation,
-        child: Container(
-          height: 56,
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          decoration: BoxDecoration(
-            color: backgroundColor,
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Center(
-            child: widget.isLoading
-                ? SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: foregroundColor,
-                    ),
-                  )
-                : Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (widget.icon != null) ...[
-                        Icon(widget.icon, color: foregroundColor, size: 20),
-                        const SizedBox(width: 8),
-                      ],
-                      Text(
-                        widget.label,
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          color: foregroundColor,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
+        child: widget.isLoading 
+          ? Container(
+              height: 56,
+              decoration: BoxDecoration(
+                color: widget.variant == MeridianButtonVariant.primary 
+                  ? theme.colorScheme.primary 
+                  : theme.colorScheme.secondaryContainer,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Center(
+                child: SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 3,
+                    color: widget.variant == MeridianButtonVariant.primary 
+                      ? theme.colorScheme.onPrimary 
+                      : theme.colorScheme.onSecondaryContainer,
                   ),
-          ),
-        ),
+                ),
+              ),
+            )
+          : (widget.variant == MeridianButtonVariant.ghost 
+              ? TextButton.icon(
+                  onPressed: widget.onPressed,
+                  style: buttonStyle,
+                  icon: widget.icon != null ? Icon(widget.icon, size: 20) : const SizedBox.shrink(),
+                  label: Text(widget.label),
+                )
+              : FilledButton.icon(
+                  onPressed: widget.onPressed,
+                  style: buttonStyle,
+                  icon: widget.icon != null ? Icon(widget.icon, size: 20) : const SizedBox.shrink(),
+                  label: Text(widget.label),
+                )),
       ),
     );
   }

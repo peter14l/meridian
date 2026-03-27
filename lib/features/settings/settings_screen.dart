@@ -11,74 +11,83 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
     final authController = ref.watch(authControllerProvider);
+    final theme = Theme.of(context);
 
     return Scaffold(
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         title: Text(
           'Settings',
-          style: Theme.of(context).textTheme.headlineLarge,
+          style: theme.textTheme.headlineLarge?.copyWith(
+            fontWeight: FontWeight.w800,
+          ),
         ),
+        centerTitle: false,
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         children: [
           _buildSectionHeader(context, 'Appearance'),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           _buildThemeCard(context, ref, themeMode),
-          const SizedBox(height: 24),
+          const SizedBox(height: 32),
           _buildSectionHeader(context, 'Notifications'),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           _buildPreferenceTile(
             context,
-            icon: Icons.notifications_none,
+            icon: Icons.notifications_none_rounded,
             title: 'Daily Briefing Time',
             subtitle: '8:00 AM',
             onTap: () {
               // Placeholder for time picker
             },
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 32),
           _buildSectionHeader(context, 'Integrations'),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           _buildPreferenceTile(
             context,
-            icon: Icons.calendar_today,
+            icon: Icons.calendar_today_rounded,
             title: 'Google Calendar',
             subtitle: 'Sync your events and deadlines',
             onTap: () {
-              // Trigger Google Calendar sign-in
               ref.read(calendarServiceProvider).signIn();
             },
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 32),
           _buildSectionHeader(context, 'Account'),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           _buildPreferenceTile(
             context,
-            icon: Icons.logout,
+            icon: Icons.logout_rounded,
             title: 'Sign Out',
             subtitle: 'Sign out of your account',
-            textColor: Theme.of(context).colorScheme.error,
-            iconColor: Theme.of(context).colorScheme.error,
+            textColor: theme.colorScheme.error,
+            iconColor: theme.colorScheme.error,
             onTap: () async {
               final shouldSignOut = await showDialog<bool>(
                 context: context,
                 builder: (context) => AlertDialog(
-                  title: const Text('Sign Out'),
-                  content: const Text('Are you sure you want to sign out?'),
+                  backgroundColor: theme.colorScheme.surfaceContainerHigh,
+                  title: Text('Sign Out', style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
+                  content: Text('Are you sure you want to sign out?', style: theme.textTheme.bodyLarge),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(context, false),
-                      child: const Text('Cancel'),
+                      child: Text('Cancel', style: theme.textTheme.labelLarge),
                     ),
                     TextButton(
                       onPressed: () => Navigator.pop(context, true),
                       child: Text(
                         'Sign Out',
-                        style: TextStyle(color: Theme.of(context).colorScheme.error),
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          color: theme.colorScheme.error,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ),
                   ],
@@ -90,27 +99,43 @@ class SettingsScreen extends ConsumerWidget {
               }
             },
           ),
+          const SizedBox(height: 48),
+          Center(
+            child: Text(
+              'Meridian v1.0.0',
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                letterSpacing: 2.0,
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
   Widget _buildSectionHeader(BuildContext context, String title) {
-    return Text(
-      title.toUpperCase(),
-      style: Theme.of(context).textTheme.labelMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.2,
-          ),
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(left: 8, bottom: 4),
+      child: Text(
+        title.toUpperCase(),
+        style: theme.textTheme.labelLarge?.copyWith(
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.5,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+      ),
     );
   }
 
   Widget _buildThemeCard(BuildContext context, WidgetRef ref, ThemeMode currentMode) {
+    final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Theme.of(context).dividerColor),
+        color: theme.colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
       ),
       child: Column(
         children: [
@@ -119,26 +144,26 @@ class SettingsScreen extends ConsumerWidget {
             ref,
             mode: ThemeMode.system,
             currentMode: currentMode,
-            icon: Icons.settings_brightness,
-            label: 'System',
+            icon: Icons.settings_brightness_rounded,
+            label: 'System Default',
           ),
-          Divider(height: 1, color: Theme.of(context).dividerColor),
+          Divider(height: 1, color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5), indent: 56),
           _buildThemeOption(
             context,
             ref,
             mode: ThemeMode.light,
             currentMode: currentMode,
-            icon: Icons.light_mode,
-            label: 'Light',
+            icon: Icons.light_mode_rounded,
+            label: 'Light Mode',
           ),
-          Divider(height: 1, color: Theme.of(context).dividerColor),
+          Divider(height: 1, color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5), indent: 56),
           _buildThemeOption(
             context,
             ref,
             mode: ThemeMode.dark,
             currentMode: currentMode,
-            icon: Icons.dark_mode,
-            label: 'Dark',
+            icon: Icons.dark_mode_rounded,
+            label: 'Dark Mode',
           ),
         ],
       ),
@@ -153,37 +178,46 @@ class SettingsScreen extends ConsumerWidget {
     required IconData icon,
     required String label,
   }) {
+    final theme = Theme.of(context);
     final isSelected = mode == currentMode;
     return InkWell(
       onTap: () => ref.read(themeModeProvider.notifier).state = mode,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(24),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         child: Row(
           children: [
-            Icon(
-              icon,
-              color: isSelected
-                  ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: isSelected ? theme.colorScheme.primary.withValues(alpha: 0.1) : Colors.transparent,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                size: 20,
+                color: isSelected
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.onSurfaceVariant,
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 label,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                style: theme.textTheme.bodyLarge?.copyWith(
                       color: isSelected
-                          ? Theme.of(context).colorScheme.primary
-                          : Theme.of(context).colorScheme.onSurface,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.onSurface,
+                      fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
                     ),
               ),
             ),
             if (isSelected)
               Icon(
-                Icons.check,
-                color: Theme.of(context).colorScheme.primary,
-                size: 20,
+                Icons.check_circle_rounded,
+                color: theme.colorScheme.primary,
+                size: 24,
               ),
           ],
         ),
@@ -200,45 +234,57 @@ class SettingsScreen extends ConsumerWidget {
     Color? textColor,
     Color? iconColor,
   }) {
+    final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Theme.of(context).dividerColor),
+        color: theme.colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
       ),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Row(
             children: [
-              Icon(
-                icon,
-                color: iconColor ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: (iconColor ?? theme.colorScheme.primary).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(
+                  icon,
+                  size: 22,
+                  color: iconColor ?? theme.colorScheme.primary,
+                ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       title,
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: textColor ?? Theme.of(context).colorScheme.onSurface,
-                            fontWeight: FontWeight.w500,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                            color: textColor ?? theme.colorScheme.onSurface,
+                            fontWeight: FontWeight.w700,
                           ),
                     ),
+                    const SizedBox(height: 2),
                     Text(
                       subtitle,
-                      style: Theme.of(context).textTheme.labelMedium,
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ],
                 ),
               ),
               Icon(
-                Icons.chevron_right,
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+                Icons.chevron_right_rounded,
+                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
               ),
             ],
           ),

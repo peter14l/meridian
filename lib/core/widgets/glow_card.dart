@@ -4,49 +4,45 @@ class GlowCard extends StatelessWidget {
   final Widget child;
   final bool isAI;
   final VoidCallback? onTap;
+  final Color? color;
 
   const GlowCard({
     super.key,
     required this.child,
     this.isAI = true,
     this.onTap,
+    this.color,
   });
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     final outerGlowColor = isDark 
-        ? const Color(0xFF818CF8).withValues(alpha: 0.4) 
-        : const Color(0xFF6366F1).withValues(alpha: 0.25);
+        ? theme.colorScheme.primary.withValues(alpha: 0.3) 
+        : theme.colorScheme.primary.withValues(alpha: 0.2);
         
-    final gradientStart = isDark ? const Color(0xFF818CF8) : const Color(0xFF6366F1);
-    final gradientEnd = isDark ? const Color(0xFFC084FC) : const Color(0xFFA855F7);
-    final currentBackground = isDark ? const Color(0xFF1A1A2E) : Colors.white;
+    final gradientStart = theme.colorScheme.primary;
+    final gradientEnd = theme.colorScheme.tertiary;
+    final currentBackground = color ?? theme.colorScheme.surfaceContainer;
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
           color: currentBackground,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(24), // Extra-Large
           boxShadow: isAI ? [
             BoxShadow(
               color: outerGlowColor,
-              blurRadius: isDark ? 18 : 14,
-              spreadRadius: 0,
+              blurRadius: isDark ? 24 : 16,
+              spreadRadius: -4,
             ),
           ] : null,
         ),
-        foregroundDecoration: isAI ? BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            width: 1.5,
-            color: Colors.transparent, // the gradient border usually needs a CustomPainter or ShaderMask
-          ),
-        ) : null,
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(24),
           child: Stack(
             children: [
               // ShaderMask for Gradient Border
@@ -55,9 +51,11 @@ class GlowCard extends StatelessWidget {
                   child: ShaderMask(
                     shaderCallback: (Rect bounds) {
                       return LinearGradient(
-                        colors: isDark 
-                            ? [gradientStart, gradientEnd, const Color(0xFF2DD4BF)]
-                            : [gradientStart, gradientEnd],
+                        colors: [
+                          gradientStart, 
+                          gradientEnd, 
+                          theme.colorScheme.secondary,
+                        ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ).createShader(bounds);
@@ -65,8 +63,8 @@ class GlowCard extends StatelessWidget {
                     blendMode: BlendMode.srcOver,
                     child: Container(
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(width: 1.5, color: Colors.white),
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(width: 2.0, color: Colors.white),
                       ),
                     ),
                   ),
@@ -75,11 +73,11 @@ class GlowCard extends StatelessWidget {
                 Positioned.fill(
                   child: Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(24),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF6C63FF).withValues(alpha: 0.2),
-                          blurRadius: 8,
+                          color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                          blurRadius: 12,
                           spreadRadius: 0,
                           blurStyle: BlurStyle.inner,
                         ),
@@ -89,7 +87,7 @@ class GlowCard extends StatelessWidget {
                 ),
               // Content Card
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(20.0),
                 child: child,
               ),
             ],

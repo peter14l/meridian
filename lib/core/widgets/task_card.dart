@@ -19,8 +19,9 @@ class TaskCard extends StatelessWidget {
     final theme = Theme.of(context);
     
     return GlowCard(
-      isAI: false, // Normal tasks aren't AI-powered by default
+      isAI: false,
       onTap: onTap,
+      color: theme.colorScheme.surfaceContainerLow,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -28,12 +29,12 @@ class TaskCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _PriorityIndicator(priority: task.priority),
-              const SizedBox(width: 8),
+              const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   task.title,
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
                     decoration: task.status == TaskStatus.done 
                         ? TextDecoration.lineThrough 
                         : null,
@@ -55,26 +56,29 @@ class TaskCard extends StatelessWidget {
               task.description!,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.labelMedium,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
           if (task.dueAt != null || task.courseId != null) ...[
-            const SizedBox(height: 12),
-            Row(
+            const SizedBox(height: 16),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
               children: [
                 if (task.dueAt != null)
                   _TagChip(
-                    icon: Icons.calendar_today,
+                    icon: Icons.calendar_today_rounded,
                     label: _formatDate(task.dueAt!),
-                    color: _isOverdue(task.dueAt!) ? theme.colorScheme.error : null,
+                    color: _isOverdue(task.dueAt!) ? theme.colorScheme.error : theme.colorScheme.primary,
                   ),
-                if (task.courseId != null) ...[
-                  if (task.dueAt != null) const SizedBox(width: 8),
+                if (task.courseId != null)
                   _TagChip(
-                    icon: Icons.book_outlined,
-                    label: task.courseId!, // Should ideally be course name
+                    icon: Icons.auto_stories_rounded,
+                    label: task.courseId!,
+                    color: theme.colorScheme.tertiary,
                   ),
-                ],
               ],
             ),
           ],
@@ -84,7 +88,10 @@ class TaskCard extends StatelessWidget {
   }
 
   String _formatDate(DateTime date) {
-    // Simple formatter for now
+    final now = DateTime.now();
+    if (date.year == now.year && date.month == now.month && date.day == now.day) {
+      return 'Today';
+    }
     return '${date.day}/${date.month}';
   }
 
@@ -103,21 +110,28 @@ class _PriorityIndicator extends StatelessWidget {
     Color color;
     switch (priority) {
       case 1:
-        color = const Color(0xFFFF6B6B); // P1 - Red
+        color = Theme.of(context).colorScheme.error;
         break;
       case 2:
-        color = const Color(0xFFFBBF24); // P2 - Amber
+        color = Colors.orangeAccent;
         break;
       default:
-        color = Colors.blueGrey; // P3 - Muted
+        color = Theme.of(context).colorScheme.outlineVariant;
     }
 
     return Container(
-      width: 4,
-      height: 24,
+      width: 6,
+      height: 32,
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadius.circular(2),
+        borderRadius: BorderRadius.circular(3),
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.3),
+            blurRadius: 8,
+            spreadRadius: 0,
+          ),
+        ],
       ),
     );
   }
@@ -133,10 +147,19 @@ class _StatusPicker extends StatelessWidget {
   Widget build(BuildContext context) {
     return PopupMenuButton<TaskStatus>(
       padding: EdgeInsets.zero,
-      icon: Icon(
-        _getStatusIcon(currentStatus),
-        size: 20,
-        color: _getStatusColor(context, currentStatus),
+      offset: const Offset(0, 40),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      icon: Container(
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: _getStatusColor(context, currentStatus).withValues(alpha: 0.1),
+          shape: BoxShape.circle,
+        ),
+        child: Icon(
+          _getStatusIcon(currentStatus),
+          size: 20,
+          color: _getStatusColor(context, currentStatus),
+        ),
       ),
       onSelected: onChanged,
       itemBuilder: (context) => [
@@ -150,50 +173,53 @@ class _StatusPicker extends StatelessWidget {
   IconData _getStatusIcon(TaskStatus status) {
     switch (status) {
       case TaskStatus.todo:
-        return Icons.radio_button_unchecked;
+        return Icons.radio_button_unchecked_rounded;
       case TaskStatus.inProgress:
-        return Icons.pending_outlined;
+        return Icons.bolt_rounded;
       case TaskStatus.done:
-        return Icons.check_circle;
+        return Icons.check_circle_rounded;
     }
   }
 
   Color _getStatusColor(BuildContext context, TaskStatus status) {
-    if (status == TaskStatus.done) {
-      return Theme.of(context).colorScheme.secondary;
+    final theme = Theme.of(context);
+    switch (status) {
+      case TaskStatus.todo:
+        return theme.colorScheme.onSurfaceVariant;
+      case TaskStatus.inProgress:
+        return theme.colorScheme.primary;
+      case TaskStatus.done:
+        return theme.colorScheme.secondary;
     }
-    return Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4);
   }
 }
 
 class _TagChip extends StatelessWidget {
   final IconData icon;
   final String label;
-  final Color? color;
+  final Color color;
 
-  const _TagChip({required this.icon, required this.label, this.color});
+  const _TagChip({required this.icon, required this.label, required this.color});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final effectiveColor = color ?? theme.colorScheme.onSurface.withValues(alpha: 0.6);
-
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: effectiveColor.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: effectiveColor),
-          const SizedBox(width: 4),
+          Icon(icon, size: 14, color: color),
+          const SizedBox(width: 6),
           Text(
             label,
-            style: theme.textTheme.labelMedium?.copyWith(
-              color: effectiveColor,
-              fontWeight: FontWeight.w500,
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+              color: color,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ],

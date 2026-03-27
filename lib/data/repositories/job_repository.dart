@@ -40,4 +40,12 @@ class JobRepository {
         .update({'deleted_at': DateTime.now().toIso8601String()})
         .eq('id', id);
   }
+
+  Future<String> draftEmail(String jobId, String type) async {
+    final response = await _client.functions.invoke(
+      'draft-email',
+      body: {'job_id': jobId, 'type': type},
+    );
+    return response.data['draft'] as String;
+  }
 }

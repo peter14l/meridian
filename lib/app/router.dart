@@ -11,6 +11,7 @@ import '../features/briefing/briefing_screen.dart';
 import '../features/jobs/jobs_screen.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/study/study_screen.dart';
+import '../features/capture/capture_screen.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -22,14 +23,34 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       SentryNavigatorObserver(),
     ],
     redirect: (context, state) {
+      final authState = ref.watch(authStateProvider);
+      final userProfile = ref.watch(userProfileProvider);
+      
       final isAuthenticated = authState.value?.session != null;
       final isAuthRoute = state.matchedLocation == '/auth';
+      final isOnboardingRoute = state.matchedLocation == '/onboarding';
 
       if (!isAuthenticated && !isAuthRoute) {
         return '/auth';
       }
-      if (isAuthenticated && isAuthRoute) {
-        return '/briefing';
+      
+      if (isAuthenticated) {
+        if (isAuthRoute) return '/briefing';
+        
+        // Check onboarding status
+        return userProfile.when(
+          data: (profile) {
+            if (profile?.onboardedAt == null && !isOnboardingRoute) {
+              return '/onboarding';
+            }
+            if (profile?.onboardedAt != null && isOnboardingRoute) {
+              return '/briefing';
+            }
+            return null;
+          },
+          loading: () => null,
+          error: (_, __) => null,
+        );
       }
       return null;
     },
@@ -57,13 +78,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                     context.go('/briefing');
                     break;
                   case 1:
-                    context.go('/tasks');
+                    context.go('/capture');
                     break;
                   case 2:
                     context.go('/jobs');
                     break;
                   case 3:
-                    context.go('/study');
+                    context.go('/tasks');
                     break;
                   case 4:
                     context.go('/settings');
@@ -74,12 +95,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                 NavigationDestination(
                   icon: Icon(Icons.auto_awesome_outlined),
                   selectedIcon: Icon(Icons.auto_awesome),
-                  label: 'Briefing',
+                  label: 'Home',
                 ),
                 NavigationDestination(
-                  icon: Icon(Icons.check_box_outlined),
-                  selectedIcon: Icon(Icons.check_box),
-                  label: 'Tasks',
+                  icon: Icon(Icons.bookmarks_outlined),
+                  selectedIcon: Icon(Icons.bookmarks),
+                  label: 'Capture',
                 ),
                 NavigationDestination(
                   icon: Icon(Icons.work_outline_rounded),
@@ -87,9 +108,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                   label: 'Jobs',
                 ),
                 NavigationDestination(
-                  icon: Icon(Icons.school_outlined),
-                  selectedIcon: Icon(Icons.school),
-                  label: 'Study',
+                  icon: Icon(Icons.check_box_outlined),
+                  selectedIcon: Icon(Icons.check_box),
+                  label: 'Tasks',
                 ),
                 NavigationDestination(
                   icon: Icon(Icons.settings_outlined),
@@ -106,16 +127,16 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const BriefingScreen(),
           ),
           GoRoute(
-            path: '/tasks',
-            builder: (context, state) => const TasksScreen(),
+            path: '/capture',
+            builder: (context, state) => const CaptureScreen(),
           ),
           GoRoute(
             path: '/jobs',
             builder: (context, state) => const JobsScreen(),
           ),
           GoRoute(
-            path: '/study',
-            builder: (context, state) => const StudyScreen(),
+            path: '/tasks',
+            builder: (context, state) => const TasksScreen(),
           ),
           GoRoute(
             path: '/settings',
@@ -129,9 +150,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
 
 int _calculateSelectedIndex(String location) {
   if (location.startsWith('/briefing')) return 0;
-  if (location.startsWith('/tasks')) return 1;
+  if (location.startsWith('/capture')) return 1;
   if (location.startsWith('/jobs')) return 2;
-  if (location.startsWith('/study')) return 3;
+  if (location.startsWith('/tasks')) return 3;
   if (location.startsWith('/settings')) return 4;
   return 0;
 }

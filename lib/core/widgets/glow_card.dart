@@ -32,7 +32,7 @@ class GlowCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: currentBackground,
-          borderRadius: BorderRadius.circular(24), // Extra-Large
+          borderRadius: BorderRadius.circular(32), // Extra-Large Increased
           boxShadow: isAI ? [
             BoxShadow(
               color: outerGlowColor,
@@ -42,7 +42,7 @@ class GlowCard extends StatelessWidget {
           ] : null,
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(32),
           child: Stack(
             children: [
               // ShaderMask for Gradient Border
@@ -63,7 +63,7 @@ class GlowCard extends StatelessWidget {
                     blendMode: BlendMode.srcOver,
                     child: Container(
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(24),
+                        borderRadius: BorderRadius.circular(32),
                         border: Border.all(width: 2.0, color: Colors.white),
                       ),
                     ),
@@ -73,7 +73,7 @@ class GlowCard extends StatelessWidget {
                 Positioned.fill(
                   child: Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(24),
+                      borderRadius: BorderRadius.circular(32),
                       boxShadow: [
                         BoxShadow(
                           color: theme.colorScheme.primary.withValues(alpha: 0.15),

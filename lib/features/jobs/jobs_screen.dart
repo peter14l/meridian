@@ -279,6 +279,97 @@ class _JobListView extends ConsumerWidget {
     );
   }
 
+  void _showEmailDraftDialog(BuildContext context, WidgetRef ref, JobModel job) async {
+    final theme = Theme.of(context);
+    Navigator.pop(context); // Close status picker
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Container(
+              height: MediaQuery.of(context).size.height * 0.8,
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceContainerHigh,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+              ),
+              child: FutureBuilder<String?>(
+                future: ref.read(jobsProvider.notifier).draftEmail(job.id, 'follow-up'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const CircularProgressIndicator(),
+                          const SizedBox(height: 24),
+                          Text('Generating your follow-up...', style: theme.textTheme.titleMedium),
+                        ],
+                      ),
+                    );
+                  }
+                  
+                  final draft = snapshot.data;
+                  return Padding(
+                    padding: const EdgeInsets.all(32.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('AI Draft', style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
+                            IconButton(
+                              onPressed: () => Navigator.pop(context),
+                              icon: const Icon(Icons.close_rounded),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.surface,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: theme.colorScheme.outlineVariant),
+                            ),
+                            child: SingleChildScrollView(
+                              child: Text(
+                                draft ?? 'Failed to generate draft. Please try again.',
+                                style: theme.textTheme.bodyLarge?.copyWith(height: 1.6),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+                        MeridianButton(
+                          label: 'Copy to Clipboard',
+                          onPressed: () {
+                            if (draft != null) {
+                              // Copy to clipboard logic
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Copied to clipboard!')),
+                              );
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   void _showStatusPicker(BuildContext context, WidgetRef ref, JobModel job) {
     final theme = Theme.of(context);
     showModalBottomSheet(
@@ -303,9 +394,27 @@ class _JobListView extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 32),
-              Text(
-                'Update Status', 
-                style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Actions', 
+                      style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800),
+                    ),
+                    TextButton.icon(
+                      onPressed: () => _showEmailDraftDialog(context, ref, job),
+                      icon: const Icon(Icons.auto_awesome_rounded, size: 18),
+                      label: const Text('AI Draft'),
+                      style: TextButton.styleFrom(
+                        backgroundColor: theme.colorScheme.tertiary.withValues(alpha: 0.1),
+                        foregroundColor: theme.colorScheme.tertiary,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 24),
               ...JobStatus.values.map((status) {

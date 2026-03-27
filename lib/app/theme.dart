@@ -25,8 +25,17 @@ class AppTheme {
       dividerColor: const Color(0xFFE0E7FF),
       cardTheme: CardThemeData(
         elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)), // Extra-Large
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)), // Extra-Large Increased
         color: const Color(0xFFFFFFFF),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: const Color(0xFFEEEEFF),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16), // Medium-Large
+          borderSide: BorderSide.none,
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       ),
     );
   }
@@ -54,8 +63,17 @@ class AppTheme {
       dividerColor: const Color(0xFF2D2D4E),
       cardTheme: CardThemeData(
         elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)), // Extra-Large
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)), // Extra-Large Increased
         color: const Color(0xFF1A1A2E),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: const Color(0xFF1A1A2E),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16), // Medium-Large
+          borderSide: BorderSide.none,
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       ),
     );
   }

@@ -51,4 +51,12 @@ class JobsController extends StateNotifier<AsyncValue<List<JobModel>>> {
       // Handle error
     }
   }
+
+  Future<String?> draftEmail(String jobId, String type) async {
+    try {
+      return await _repository.draftEmail(jobId, type);
+    } catch (e) {
+      return null;
+    }
+  }
 }

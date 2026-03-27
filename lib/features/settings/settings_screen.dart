@@ -58,6 +58,28 @@ class SettingsScreen extends ConsumerWidget {
             },
           ),
           const SizedBox(height: 32),
+          _buildSectionHeader(context, 'Data Management'),
+          const SizedBox(height: 12),
+          _buildPreferenceTile(
+            context,
+            icon: Icons.auto_stories_rounded,
+            title: 'Course Management',
+            subtitle: 'Add or remove your courses',
+            onTap: () {
+              // Navigate to course management
+            },
+          ),
+          const SizedBox(height: 16),
+          _buildPreferenceTile(
+            context,
+            icon: Icons.download_rounded,
+            title: 'Export Data',
+            subtitle: 'Download your data in JSON format',
+            onTap: () {
+              // Data export logic
+            },
+          ),
+          const SizedBox(height: 32),
           _buildSectionHeader(context, 'Account'),
           const SizedBox(height: 12),
           _buildPreferenceTile(
@@ -65,37 +87,37 @@ class SettingsScreen extends ConsumerWidget {
             icon: Icons.logout_rounded,
             title: 'Sign Out',
             subtitle: 'Sign out of your account',
+            onTap: () async {
+              final shouldSignOut = await _showConfirmDialog(
+                context,
+                title: 'Sign Out',
+                content: 'Are you sure you want to sign out?',
+                confirmLabel: 'Sign Out',
+                isDestructive: true,
+              );
+              if (shouldSignOut == true) {
+                await authController.signOut();
+              }
+            },
+          ),
+          const SizedBox(height: 16),
+          _buildPreferenceTile(
+            context,
+            icon: Icons.delete_forever_rounded,
+            title: 'Delete Account',
+            subtitle: 'Permanently remove all your data',
             textColor: theme.colorScheme.error,
             iconColor: theme.colorScheme.error,
             onTap: () async {
-              final shouldSignOut = await showDialog<bool>(
-                context: context,
-                builder: (context) => AlertDialog(
-                  backgroundColor: theme.colorScheme.surfaceContainerHigh,
-                  title: Text('Sign Out', style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
-                  content: Text('Are you sure you want to sign out?', style: theme.textTheme.bodyLarge),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, false),
-                      child: Text('Cancel', style: theme.textTheme.labelLarge),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, true),
-                      child: Text(
-                        'Sign Out',
-                        style: theme.textTheme.labelLarge?.copyWith(
-                          color: theme.colorScheme.error,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              final shouldDelete = await _showConfirmDialog(
+                context,
+                title: 'Delete Account',
+                content: 'This action is permanent and cannot be undone. All your data will be wiped.',
+                confirmLabel: 'Delete Forever',
+                isDestructive: true,
               );
-
-              if (shouldSignOut == true) {
-                await authController.signOut();
+              if (shouldDelete == true) {
+                // Delete account logic
               }
             },
           ),
@@ -289,6 +311,35 @@ class SettingsScreen extends ConsumerWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Future<bool?> _showConfirmDialog(
+    BuildContext context, {
+    required String title,
+    required String content,
+    required String confirmLabel,
+    bool isDestructive = false,
+  }) {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(content),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: isDestructive
+                ? TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.error)
+                : null,
+            child: Text(confirmLabel),
+          ),
+        ],
       ),
     );
   }

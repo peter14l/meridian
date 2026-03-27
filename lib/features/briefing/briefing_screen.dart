@@ -4,6 +4,7 @@ import '../../core/widgets/glow_card.dart';
 import '../../core/widgets/meridian_button.dart';
 import 'briefing_controller.dart';
 import '../../data/models/briefing_model.dart';
+import '../../core/widgets/shimmer_loader.dart';
 
 class BriefingScreen extends ConsumerWidget {
   const BriefingScreen({super.key});
@@ -125,111 +126,113 @@ class _BriefingContentView extends StatelessWidget {
     final insight = content['insight'] as String? ?? 'No insight available.';
     final tasks = (content['highlighted_tasks'] as List? ?? []);
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            "Today's Focus",
-            style: theme.textTheme.headlineLarge?.copyWith(
-              fontWeight: FontWeight.w800,
+    return FadeInUp(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              "Today's Focus",
+              style: theme.textTheme.headlineLarge?.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
             ),
-          ),
-          const SizedBox(height: 24),
-          GlowCard(
-            isAI: true,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.tertiary.withValues(alpha: 0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(Icons.auto_awesome_rounded, color: theme.colorScheme.tertiary, size: 18),
-                    ),
-                    const SizedBox(width: 10),
-                    Text(
-                      'MERIDIAN AI INSIGHT',
-                      style: theme.textTheme.labelLarge?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 1.2,
-                        color: theme.colorScheme.tertiary,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  insight,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    height: 1.4,
-                    fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurface,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 40),
-          if (tasks.isNotEmpty) ...[
-            _SectionHeader(title: 'Top Priorities', icon: Icons.bolt_rounded, color: theme.colorScheme.primary),
-            const SizedBox(height: 16),
-            ...tasks.map((task) => _TaskItem(task: task)),
-          ],
-          const SizedBox(height: 32),
-          _SectionHeader(title: 'Learning Goal', icon: Icons.auto_stories_rounded, color: theme.colorScheme.secondary),
-          const SizedBox(height: 16),
-          GlowCard(
-            isAI: false,
-            color: theme.colorScheme.surfaceContainerLow,
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.secondary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(Icons.menu_book_rounded, color: theme.colorScheme.secondary, size: 24),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            const SizedBox(height: 24),
+            GlowCard(
+              isAI: true,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      Text(
-                        'DSA for Placements', 
-                        style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.tertiary.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(Icons.auto_awesome_rounded, color: theme.colorScheme.tertiary, size: 18),
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(width: 10),
                       Text(
-                        'Next: Binary Search Trees', 
-                        style: theme.textTheme.labelMedium?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
+                        'MERIDIAN AI INSIGHT',
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.2,
+                          color: theme.colorScheme.tertiary,
                         ),
                       ),
                     ],
                   ),
-                ),
-                Icon(Icons.chevron_right_rounded, color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
-              ],
+                  const SizedBox(height: 16),
+                  Text(
+                    insight,
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      height: 1.4,
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 48),
-          MeridianButton(
-            label: 'Complete Morning Briefing',
-            variant: MeridianButtonVariant.secondary,
-            onPressed: () {
-              // Mark as complete logic
-            },
-          ),
-          const SizedBox(height: 32),
-        ],
+            const SizedBox(height: 40),
+            if (tasks.isNotEmpty) ...[
+              _SectionHeader(title: 'Top Priorities', icon: Icons.bolt_rounded, color: theme.colorScheme.primary),
+              const SizedBox(height: 16),
+              ...tasks.map((task) => _TaskItem(task: task)),
+            ],
+            const SizedBox(height: 32),
+            _SectionHeader(title: 'Learning Goal', icon: Icons.auto_stories_rounded, color: theme.colorScheme.secondary),
+            const SizedBox(height: 16),
+            GlowCard(
+              isAI: false,
+              color: theme.colorScheme.surfaceContainerLow,
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.secondary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(Icons.menu_book_rounded, color: theme.colorScheme.secondary, size: 24),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'DSA for Placements', 
+                          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Next: Binary Search Trees', 
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(Icons.chevron_right_rounded, color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
+                ],
+              ),
+            ),
+            const SizedBox(height: 48),
+            MeridianButton(
+              label: 'Complete Morning Briefing',
+              variant: MeridianButtonVariant.secondary,
+              onPressed: () {
+                // Mark as complete logic
+              },
+            ),
+            const SizedBox(height: 32),
+          ],
+        ),
       ),
     );
   }
@@ -328,24 +331,36 @@ class _BriefingLoadingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Center(
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20.0),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          CircularProgressIndicator(
-            strokeWidth: 6,
-            backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
-            valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
+          const ShimmerLoader(width: 200, height: 40),
+          const SizedBox(height: 24),
+          const ShimmerLoader(width: double.infinity, height: 180, borderRadius: 32),
+          const SizedBox(height: 40),
+          const Row(
+            children: [
+              ShimmerLoader(width: 20, height: 20, borderRadius: 10),
+              SizedBox(width: 10),
+              ShimmerLoader(width: 120, height: 16),
+            ],
           ),
+          const SizedBox(height: 16),
+          const ShimmerLoader(width: double.infinity, height: 80, borderRadius: 20),
+          const SizedBox(height: 12),
+          const ShimmerLoader(width: double.infinity, height: 80, borderRadius: 20),
           const SizedBox(height: 32),
-          Text(
-            'Preparing your briefing...',
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
+          const Row(
+            children: [
+              ShimmerLoader(width: 20, height: 20, borderRadius: 10),
+              SizedBox(width: 10),
+              ShimmerLoader(width: 120, height: 16),
+            ],
           ),
+          const SizedBox(height: 16),
+          const ShimmerLoader(width: double.infinity, height: 100, borderRadius: 32),
         ],
       ),
     );

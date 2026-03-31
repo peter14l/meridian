@@ -49,5 +49,7 @@ class OnboardingController extends StateNotifier<int> {
         goals.map((title) => {'user_id': user.id, 'title': title}).toList()
       );
     }
+
+    _ref.invalidate(userProfileProvider);
   }
 }

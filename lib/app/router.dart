@@ -10,55 +10,66 @@ import '../features/tasks/tasks_screen.dart';
 import '../features/briefing/briefing_screen.dart';
 import '../features/jobs/jobs_screen.dart';
 import '../features/settings/settings_screen.dart';
-import '../features/study/study_screen.dart';
 import '../features/capture/capture_screen.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
-  final authState = ref.watch(authStateProvider);
-
   return GoRouter(
-    initialLocation: '/briefing',
-    observers: [
-      PosthogObserver(),
-      SentryNavigatorObserver(),
-    ],
+    initialLocation: '/auth',
+    observers: [PosthogObserver(), SentryNavigatorObserver()],
     redirect: (context, state) {
-      final authState = ref.watch(authStateProvider);
-      final userProfile = ref.watch(userProfileProvider);
-      
-      final isAuthenticated = authState.value?.session != null;
-      final isAuthRoute = state.matchedLocation == '/auth';
-      final isOnboardingRoute = state.matchedLocation == '/onboarding';
+      // Use try-catch to handle any errors in redirect logic
+      try {
+        final authState = ref.watch(authStateProvider);
+        final userProfileAsync = ref.watch(userProfileProvider);
 
-      if (!isAuthenticated && !isAuthRoute) {
+        final isAuthRoute = state.matchedLocation == '/auth';
+        final isOnboardingRoute = state.matchedLocation == '/onboarding';
+
+        // Not authenticated - redirect to auth (but not if already there)
+        final authValue = authState.value;
+        final isAuthenticated = authValue?.session != null;
+        if (!isAuthenticated && !isAuthRoute) {
+          return '/auth';
+        }
+
+        // Authenticated - check where to go
+        if (isAuthenticated) {
+          // If on auth page, go to briefing (will check onboarding)
+          if (isAuthRoute) {
+            return '/briefing';
+          }
+
+          // Check onboarding status
+          return userProfileAsync.when(
+            data: (profile) {
+              if (profile == null) {
+                // No profile yet, go to onboarding
+                if (!isOnboardingRoute) {
+                  return '/onboarding';
+                }
+                return null;
+              }
+              if (profile.onboardedAt == null && !isOnboardingRoute) {
+                return '/onboarding';
+              }
+              // All done, stay on current page or go to briefing
+              if (profile.onboardedAt != null && isOnboardingRoute) {
+                return '/briefing';
+              }
+              return null;
+            },
+            loading: () => null,
+            error: (_, __) => null,
+          );
+        }
+      } catch (e) {
+        // On error, go to auth
         return '/auth';
-      }
-      
-      if (isAuthenticated) {
-        if (isAuthRoute) return '/briefing';
-        
-        // Check onboarding status
-        return userProfile.when(
-          data: (profile) {
-            if (profile?.onboardedAt == null && !isOnboardingRoute) {
-              return '/onboarding';
-            }
-            if (profile?.onboardedAt != null && isOnboardingRoute) {
-              return '/briefing';
-            }
-            return null;
-          },
-          loading: () => null,
-          error: (_, __) => null,
-        );
       }
       return null;
     },
     routes: [
-      GoRoute(
-        path: '/auth',
-        builder: (context, state) => const AuthScreen(),
-      ),
+      GoRoute(path: '/auth', builder: (context, state) => const AuthScreen()),
       GoRoute(
         path: '/onboarding',
         builder: (context, state) => const OnboardingScreen(),

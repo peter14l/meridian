@@ -31,7 +31,8 @@ class BriefingScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded),
-            onPressed: () => ref.read(briefingProvider.notifier).generateNewBriefing(),
+            onPressed: () =>
+                ref.read(briefingProvider.notifier).generateNewBriefing(),
           ),
           const SizedBox(width: 8),
         ],
@@ -39,9 +40,11 @@ class BriefingScreen extends ConsumerWidget {
       body: briefingAsync.when(
         data: (briefing) {
           if (briefing == null) {
-            return _EmptyBriefingView(onGenerate: () {
-              ref.read(briefingProvider.notifier).generateNewBriefing();
-            });
+            return _EmptyBriefingView(
+              onGenerate: () {
+                ref.read(briefingProvider.notifier).generateNewBriefing();
+              },
+            );
           }
           return _BriefingContentView(briefing: briefing);
         },
@@ -76,7 +79,9 @@ class _EmptyBriefingView extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(32),
               decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
+                color: theme.colorScheme.primaryContainer.withValues(
+                  alpha: 0.3,
+                ),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -149,10 +154,16 @@ class _BriefingContentView extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.tertiary.withValues(alpha: 0.1),
+                          color: theme.colorScheme.tertiary.withValues(
+                            alpha: 0.1,
+                          ),
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(Icons.auto_awesome_rounded, color: theme.colorScheme.tertiary, size: 18),
+                        child: Icon(
+                          Icons.auto_awesome_rounded,
+                          color: theme.colorScheme.tertiary,
+                          size: 18,
+                        ),
                       ),
                       const SizedBox(width: 10),
                       Text(
@@ -179,12 +190,20 @@ class _BriefingContentView extends StatelessWidget {
             ),
             const SizedBox(height: 40),
             if (tasks.isNotEmpty) ...[
-              _SectionHeader(title: 'Top Priorities', icon: Icons.bolt_rounded, color: theme.colorScheme.primary),
+              _SectionHeader(
+                title: 'Top Priorities',
+                icon: Icons.bolt_rounded,
+                color: theme.colorScheme.primary,
+              ),
               const SizedBox(height: 16),
               ...tasks.map((task) => _TaskItem(task: task)),
             ],
             const SizedBox(height: 32),
-            _SectionHeader(title: 'Learning Goal', icon: Icons.auto_stories_rounded, color: theme.colorScheme.secondary),
+            _SectionHeader(
+              title: 'Learning Goal',
+              icon: Icons.auto_stories_rounded,
+              color: theme.colorScheme.secondary,
+            ),
             const SizedBox(height: 16),
             GlowCard(
               isAI: false,
@@ -197,7 +216,11 @@ class _BriefingContentView extends StatelessWidget {
                       color: theme.colorScheme.secondary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(Icons.menu_book_rounded, color: theme.colorScheme.secondary, size: 24),
+                    child: Icon(
+                      Icons.menu_book_rounded,
+                      color: theme.colorScheme.secondary,
+                      size: 24,
+                    ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -205,12 +228,14 @@ class _BriefingContentView extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'DSA for Placements', 
-                          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                          'DSA for Placements',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'Next: Binary Search Trees', 
+                          'Next: Binary Search Trees',
                           style: theme.textTheme.labelMedium?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
@@ -218,7 +243,12 @@ class _BriefingContentView extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Icon(Icons.chevron_right_rounded, color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    color: theme.colorScheme.onSurfaceVariant.withValues(
+                      alpha: 0.5,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -229,6 +259,133 @@ class _BriefingContentView extends StatelessWidget {
               onPressed: () {
                 // Mark as complete logic
               },
+            ),
+            const SizedBox(height: 32),
+
+            // Weekly Review Card
+            _SectionHeader(
+              title: 'Weekly Review',
+              icon: Icons.analytics_rounded,
+              color: theme.colorScheme.tertiary,
+            ),
+            const SizedBox(height: 16),
+            GlowCard(
+              isAI: true,
+              color: theme.colorScheme.tertiaryContainer.withValues(alpha: 0.3),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.calendar_view_week_rounded,
+                        color: theme.colorScheme.tertiary,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'This Week',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      _StatItem(
+                        label: 'Tasks Done',
+                        value: '12',
+                        icon: Icons.check_circle_outline,
+                        color: Colors.green,
+                      ),
+                      _StatItem(
+                        label: 'Applied',
+                        value: '5',
+                        icon: Icons.send_outlined,
+                        color: theme.colorScheme.primary,
+                      ),
+                      _StatItem(
+                        label: 'Hours Studied',
+                        value: '18',
+                        icon: Icons.timer_outlined,
+                        color: theme.colorScheme.secondary,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Great progress! You completed 20% more tasks than last week.',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // AI Reflection Card
+            _SectionHeader(
+              title: 'AI Reflection',
+              icon: Icons.psychology_rounded,
+              color: theme.colorScheme.primary,
+            ),
+            const SizedBox(height: 16),
+            GlowCard(
+              isAI: true,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary.withValues(
+                            alpha: 0.1,
+                          ),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.auto_awesome_rounded,
+                          color: theme.colorScheme.primary,
+                          size: 18,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        'PATTERN INSIGHT',
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.2,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'You tend to be most productive on Tuesday and Thursday mornings. Consider scheduling important tasks during these windows.',
+                    style: theme.textTheme.bodyLarge?.copyWith(height: 1.5),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      _InsightChip(
+                        label: 'Peak: Tue/Thu AM',
+                        icon: Icons.schedule,
+                      ),
+                      const SizedBox(width: 8),
+                      _InsightChip(
+                        label: 'Best: Focus work',
+                        icon: Icons.psychology,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 32),
           ],
@@ -243,7 +400,11 @@ class _SectionHeader extends StatelessWidget {
   final IconData icon;
   final Color color;
 
-  const _SectionHeader({required this.title, required this.icon, required this.color});
+  const _SectionHeader({
+    required this.title,
+    required this.icon,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -255,10 +416,10 @@ class _SectionHeader extends StatelessWidget {
         Text(
           title.toUpperCase(),
           style: theme.textTheme.labelLarge?.copyWith(
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.5,
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1.5,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
         ),
       ],
     );
@@ -281,12 +442,14 @@ class _TaskItem extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
+        border: Border.all(
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+        ),
       ),
       child: Row(
         children: [
           Icon(
-            Icons.radio_button_unchecked_rounded, 
+            Icons.radio_button_unchecked_rounded,
             color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
             size: 24,
           ),
@@ -308,7 +471,11 @@ class _TaskItem extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.bolt_rounded, color: theme.colorScheme.error, size: 14),
+                  Icon(
+                    Icons.bolt_rounded,
+                    color: theme.colorScheme.error,
+                    size: 14,
+                  ),
                   const SizedBox(width: 4),
                   Text(
                     'P1',
@@ -338,7 +505,11 @@ class _BriefingLoadingView extends StatelessWidget {
         children: [
           const ShimmerLoader(width: 200, height: 40),
           const SizedBox(height: 24),
-          const ShimmerLoader(width: double.infinity, height: 180, borderRadius: 32),
+          const ShimmerLoader(
+            width: double.infinity,
+            height: 180,
+            borderRadius: 32,
+          ),
           const SizedBox(height: 40),
           const Row(
             children: [
@@ -348,9 +519,17 @@ class _BriefingLoadingView extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          const ShimmerLoader(width: double.infinity, height: 80, borderRadius: 20),
+          const ShimmerLoader(
+            width: double.infinity,
+            height: 80,
+            borderRadius: 20,
+          ),
           const SizedBox(height: 12),
-          const ShimmerLoader(width: double.infinity, height: 80, borderRadius: 20),
+          const ShimmerLoader(
+            width: double.infinity,
+            height: 80,
+            borderRadius: 20,
+          ),
           const SizedBox(height: 32),
           const Row(
             children: [
@@ -360,7 +539,84 @@ class _BriefingLoadingView extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          const ShimmerLoader(width: double.infinity, height: 100, borderRadius: 32),
+          const ShimmerLoader(
+            width: double.infinity,
+            height: 100,
+            borderRadius: 32,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatItem extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+  final Color color;
+
+  const _StatItem({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Expanded(
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 24),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          Text(
+            label,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InsightChip extends StatelessWidget {
+  final String label;
+  final IconData icon;
+
+  const _InsightChip({required this.label, required this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.primaryContainer.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: theme.colorScheme.primary),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.primary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );

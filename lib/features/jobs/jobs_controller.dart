@@ -3,10 +3,11 @@ import 'package:flutter_riverpod/legacy.dart';
 import '../../data/models/job_model.dart';
 import '../../data/repositories/job_repository.dart';
 
-final jobsProvider = StateNotifierProvider<JobsController, AsyncValue<List<JobModel>>>((ref) {
-  final repository = ref.watch(jobRepositoryProvider);
-  return JobsController(repository);
-});
+final jobsProvider =
+    StateNotifierProvider<JobsController, AsyncValue<List<JobModel>>>((ref) {
+      final repository = ref.watch(jobRepositoryProvider);
+      return JobsController(repository);
+    });
 
 class JobsController extends StateNotifier<AsyncValue<List<JobModel>>> {
   final JobRepository _repository;
@@ -29,8 +30,8 @@ class JobsController extends StateNotifier<AsyncValue<List<JobModel>>> {
     try {
       await _repository.createJob(job);
       await loadJobs();
-    } catch (e) {
-      // Handle error
+    } on Exception catch (e) {
+      state = AsyncValue.error(e, StackTrace.current);
     }
   }
 
@@ -38,8 +39,8 @@ class JobsController extends StateNotifier<AsyncValue<List<JobModel>>> {
     try {
       await _repository.updateJobStatus(id, status);
       await loadJobs();
-    } catch (e) {
-      // Handle error
+    } on Exception catch (e) {
+      state = AsyncValue.error(e, StackTrace.current);
     }
   }
 
@@ -47,15 +48,15 @@ class JobsController extends StateNotifier<AsyncValue<List<JobModel>>> {
     try {
       await _repository.deleteJob(id);
       await loadJobs();
-    } catch (e) {
-      // Handle error
+    } on Exception catch (e) {
+      state = AsyncValue.error(e, StackTrace.current);
     }
   }
 
   Future<String?> draftEmail(String jobId, String type) async {
     try {
       return await _repository.draftEmail(jobId, type);
-    } catch (e) {
+    } on Exception {
       return null;
     }
   }

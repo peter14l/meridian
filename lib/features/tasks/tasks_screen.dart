@@ -5,6 +5,7 @@ import 'tasks_controller.dart';
 import '../../data/models/task_model.dart';
 import '../../core/widgets/task_card.dart';
 import '../../core/widgets/meridian_button.dart';
+import '../../core/widgets/shimmer_loader.dart';
 import '../auth/auth_controller.dart';
 
 class TasksScreen extends ConsumerWidget {
@@ -31,8 +32,12 @@ class TasksScreen extends ConsumerWidget {
       ),
       body: tasksAsync.when(
         data: (tasks) {
-          final todos = tasks.where((t) => t.status == TaskStatus.todo).toList();
-          final inProgress = tasks.where((t) => t.status == TaskStatus.inProgress).toList();
+          final todos = tasks
+              .where((t) => t.status == TaskStatus.todo)
+              .toList();
+          final inProgress = tasks
+              .where((t) => t.status == TaskStatus.inProgress)
+              .toList();
           final done = tasks.where((t) => t.status == TaskStatus.done).toList();
 
           return DefaultTabController(
@@ -40,7 +45,10 @@ class TasksScreen extends ConsumerWidget {
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   child: Container(
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
@@ -56,7 +64,9 @@ class TasksScreen extends ConsumerWidget {
                       indicatorSize: TabBarIndicatorSize.tab,
                       labelColor: theme.colorScheme.onPrimary,
                       unselectedLabelColor: theme.colorScheme.onSurfaceVariant,
-                      labelStyle: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700),
+                      labelStyle: theme.textTheme.labelLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
                       tabs: const [
                         Tab(text: 'To Do'),
                         Tab(text: 'Active'),
@@ -69,7 +79,10 @@ class TasksScreen extends ConsumerWidget {
                   child: TabBarView(
                     children: [
                       _TaskList(tasks: todos, status: TaskStatus.todo),
-                      _TaskList(tasks: inProgress, status: TaskStatus.inProgress),
+                      _TaskList(
+                        tasks: inProgress,
+                        status: TaskStatus.inProgress,
+                      ),
                       _TaskList(tasks: done, status: TaskStatus.done),
                     ],
                   ),
@@ -78,15 +91,84 @@ class TasksScreen extends ConsumerWidget {
             ),
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => _buildLoadingShimmer(context),
         error: (err, stack) => Center(child: Text('Error: $err')),
       ),
       floatingActionButton: FloatingActionButton.large(
         onPressed: () => _showAddTaskSheet(context, ref),
         backgroundColor: theme.colorScheme.primary,
         foregroundColor: theme.colorScheme.onPrimary,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)), // Extra-Large
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+        ), // Extra-Large
         child: const Icon(Icons.add_rounded, size: 32),
+      ),
+    );
+  }
+
+  Widget _buildLoadingShimmer(BuildContext context) {
+    final theme = Theme.of(context);
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 8),
+          // Tab bar shimmer
+          Row(
+            children: List.generate(3, (index) {
+              return Expanded(
+                child: Container(
+                  margin: EdgeInsets.only(right: index < 2 ? 8 : 0),
+                  height: 48,
+                  child: ShimmerLoader(
+                    width: double.infinity,
+                    height: 48,
+                    borderRadius: 12,
+                  ),
+                ),
+              );
+            }),
+          ),
+          const SizedBox(height: 24),
+          // Task cards shimmer
+          ...List.generate(4, (index) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainer,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ShimmerLoader(
+                      width: MediaQuery.of(context).size.width * 0.5,
+                      height: 20,
+                      borderRadius: 8,
+                    ),
+                    const SizedBox(height: 12),
+                    ShimmerLoader(
+                      width: MediaQuery.of(context).size.width * 0.7,
+                      height: 14,
+                      borderRadius: 8,
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        ShimmerLoader(width: 60, height: 28, borderRadius: 14),
+                        const SizedBox(width: 8),
+                        ShimmerLoader(width: 60, height: 28, borderRadius: 14),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }),
+        ],
       ),
     );
   }
@@ -111,7 +193,9 @@ class TasksScreen extends ConsumerWidget {
             return Container(
               decoration: BoxDecoration(
                 color: theme.colorScheme.surfaceContainerHigh,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(32),
+                ),
               ),
               padding: EdgeInsets.only(
                 bottom: MediaQuery.of(context).viewInsets.bottom + 32,
@@ -128,17 +212,19 @@ class TasksScreen extends ConsumerWidget {
                       width: 48,
                       height: 6,
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.2),
+                        color: theme.colorScheme.onSurfaceVariant.withValues(
+                          alpha: 0.2,
+                        ),
                         borderRadius: BorderRadius.circular(3),
                       ),
                     ),
                   ),
                   const SizedBox(height: 32),
                   Text(
-                    'New Task', 
+                    'New Task',
                     style: theme.textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.w800,
-                    )
+                    ),
                   ),
                   const SizedBox(height: 24),
                   TextField(
@@ -148,7 +234,9 @@ class TasksScreen extends ConsumerWidget {
                     decoration: InputDecoration(
                       hintText: 'What needs to be done?',
                       hintStyle: theme.textTheme.titleLarge?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+                        color: theme.colorScheme.onSurfaceVariant.withValues(
+                          alpha: 0.4,
+                        ),
                       ),
                       border: InputBorder.none,
                     ),
@@ -160,7 +248,9 @@ class TasksScreen extends ConsumerWidget {
                     decoration: InputDecoration(
                       hintText: 'Add description (optional)',
                       hintStyle: theme.textTheme.bodyLarge?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
+                        color: theme.colorScheme.onSurfaceVariant.withValues(
+                          alpha: 0.3,
+                        ),
                       ),
                       border: InputBorder.none,
                     ),
@@ -237,15 +327,17 @@ class _TaskList extends ConsumerWidget {
               child: Icon(
                 Icons.task_alt_rounded,
                 size: 48,
-                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+                color: Theme.of(
+                  context,
+                ).colorScheme.primary.withValues(alpha: 0.5),
               ),
             ),
             const SizedBox(height: 24),
             Text(
               'All clear for now',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
         ),
@@ -306,7 +398,9 @@ class _PriorityButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? color.withValues(alpha: 0.15) : theme.colorScheme.surfaceContainer,
+          color: isSelected
+              ? color.withValues(alpha: 0.15)
+              : theme.colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected ? color : Colors.transparent,
@@ -319,11 +413,16 @@ class _PriorityButton extends StatelessWidget {
               width: 10,
               height: 10,
               decoration: BoxDecoration(
-                color: color, 
+                color: color,
                 shape: BoxShape.circle,
-                boxShadow: isSelected ? [
-                  BoxShadow(color: color.withValues(alpha: 0.4), blurRadius: 4)
-                ] : null,
+                boxShadow: isSelected
+                    ? [
+                        BoxShadow(
+                          color: color.withValues(alpha: 0.4),
+                          blurRadius: 4,
+                        ),
+                      ]
+                    : null,
               ),
             ),
             const SizedBox(width: 8),

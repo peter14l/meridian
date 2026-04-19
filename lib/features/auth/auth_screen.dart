@@ -56,7 +56,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               ),
             ),
           ),
-          
+
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
@@ -82,7 +82,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 64),
-                    
+
                     TextField(
                       controller: _emailController,
                       style: theme.textTheme.bodyLarge,
@@ -94,7 +94,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                           borderRadius: BorderRadius.circular(16),
                           borderSide: BorderSide.none,
                         ),
-                        prefixIcon: Icon(Icons.email_outlined, color: theme.colorScheme.primary),
+                        prefixIcon: Icon(
+                          Icons.email_outlined,
+                          color: theme.colorScheme.primary,
+                        ),
                       ),
                       keyboardType: TextInputType.emailAddress,
                     ),
@@ -110,12 +113,15 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                           borderRadius: BorderRadius.circular(16),
                           borderSide: BorderSide.none,
                         ),
-                        prefixIcon: Icon(Icons.lock_outline_rounded, color: theme.colorScheme.primary),
+                        prefixIcon: Icon(
+                          Icons.lock_outline_rounded,
+                          color: theme.colorScheme.primary,
+                        ),
                       ),
                       obscureText: true,
                     ),
                     const SizedBox(height: 32),
-                    
+
                     MeridianButton(
                       label: _isLogin ? 'Sign In' : 'Create Account',
                       variant: MeridianButtonVariant.primary,
@@ -123,18 +129,83 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         final auth = ref.read(authControllerProvider);
                         try {
                           if (_isLogin) {
-                            await auth.signInWithEmail(_emailController.text, _passwordController.text);
+                            await auth.signInWithEmail(
+                              _emailController.text,
+                              _passwordController.text,
+                            );
                           } else {
-                            await auth.signUpWithEmail(_emailController.text, _passwordController.text);
+                            await auth.signUpWithEmail(
+                              _emailController.text,
+                              _passwordController.text,
+                            );
                           }
-                        } catch (e) {
+                        } on Exception catch (e) {
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(e.toString()),
                                 backgroundColor: theme.colorScheme.error,
                                 behavior: SnackBarBehavior.floating,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            );
+                          }
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Divider with "or"
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Divider(
+                            color: theme.colorScheme.outlineVariant.withValues(
+                              alpha: 0.3,
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Text(
+                            'or',
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Divider(
+                            color: theme.colorScheme.outlineVariant.withValues(
+                              alpha: 0.3,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Google Sign-In Button
+                    MeridianButton(
+                      label: 'Continue with Google',
+                      variant: MeridianButtonVariant.secondary,
+                      icon: Icons.g_mobiledata_rounded,
+                      onPressed: () async {
+                        final auth = ref.read(authControllerProvider);
+                        try {
+                          await auth.signInWithGoogle();
+                        } on Exception catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(e.toString()),
+                                backgroundColor: theme.colorScheme.error,
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
                               ),
                             );
                           }
@@ -148,7 +219,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         foregroundColor: theme.colorScheme.onSurfaceVariant,
                       ),
                       child: Text(
-                        _isLogin ? 'New to Meridian? Sign Up' : 'Have an account? Sign In',
+                        _isLogin
+                            ? 'New to Meridian? Sign Up'
+                            : 'Have an account? Sign In',
                         style: theme.textTheme.labelLarge?.copyWith(
                           fontWeight: FontWeight.w700,
                         ),

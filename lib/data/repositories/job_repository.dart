@@ -30,8 +30,25 @@ class JobRepository {
   Future<void> updateJobStatus(String id, JobStatus status) async {
     await _client
         .from('job_applications')
-        .update({'status': status.name.toLowerCase()})
+        .update({'status': _jobStatusToString(status)})
         .eq('id', id);
+  }
+
+  String _jobStatusToString(JobStatus status) {
+    switch (status) {
+      case JobStatus.saved:
+        return 'saved';
+      case JobStatus.applied:
+        return 'applied';
+      case JobStatus.oa:
+        return 'oa';
+      case JobStatus.interview:
+        return 'interview';
+      case JobStatus.offer:
+        return 'offer';
+      case JobStatus.rejected:
+        return 'rejected';
+    }
   }
 
   Future<void> deleteJob(String id) async {

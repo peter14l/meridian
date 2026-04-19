@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:convert';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../auth/auth_controller.dart';
 import '../../data/services/calendar_service.dart';
+import 'course_management_screen.dart';
+import 'smart_inbox_screen.dart';
+import 'data_export_controller.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -57,6 +63,21 @@ class SettingsScreen extends ConsumerWidget {
               ref.read(calendarServiceProvider).signIn();
             },
           ),
+          const SizedBox(height: 16),
+          _buildPreferenceTile(
+            context,
+            icon: Icons.inbox_rounded,
+            title: 'Smart Inbox',
+            subtitle: 'View recruitment emails from Gmail',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SmartInboxScreen(),
+                ),
+              );
+            },
+          ),
           const SizedBox(height: 32),
           _buildSectionHeader(context, 'Data Management'),
           const SizedBox(height: 12),
@@ -66,7 +87,12 @@ class SettingsScreen extends ConsumerWidget {
             title: 'Course Management',
             subtitle: 'Add or remove your courses',
             onTap: () {
-              // Navigate to course management
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const CourseManagementScreen(),
+                ),
+              );
             },
           ),
           const SizedBox(height: 16),
@@ -75,8 +101,42 @@ class SettingsScreen extends ConsumerWidget {
             icon: Icons.download_rounded,
             title: 'Export Data',
             subtitle: 'Download your data in JSON format',
-            onTap: () {
-              // Data export logic
+            onTap: () async {
+              try {
+                final exportController = ref.read(exportDataProvider);
+                final data = await exportController.exportAllData();
+
+                // Save to file
+                final jsonString = const JsonEncoder.withIndent(
+                  '  ',
+                ).convert(data);
+                final directory = await getApplicationDocumentsDirectory();
+                final timestamp = DateTime.now().toIso8601String().split(
+                  'T',
+                )[0];
+                final file = File(
+                  '${directory.path}/meridian_export_$timestamp.json',
+                );
+                await file.writeAsString(jsonString);
+
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Data exported to ${file.path}'),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                    ),
+                  );
+                }
+              } on Exception catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Export failed: $e'),
+                      backgroundColor: Theme.of(context).colorScheme.error,
+                    ),
+                  );
+                }
+              }
             },
           ),
           const SizedBox(height: 32),
@@ -112,12 +172,32 @@ class SettingsScreen extends ConsumerWidget {
               final shouldDelete = await _showConfirmDialog(
                 context,
                 title: 'Delete Account',
-                content: 'This action is permanent and cannot be undone. All your data will be wiped.',
+                content:
+                    'This action is permanent and cannot be undone. All your data will be wiped.',
                 confirmLabel: 'Delete Forever',
                 isDestructive: true,
               );
               if (shouldDelete == true) {
-                // Delete account logic
+                try {
+                  final exportController = ref.read(exportDataProvider);
+                  await exportController.deleteAccount();
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Account deleted successfully'),
+                      ),
+                    );
+                  }
+                } on Exception catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Delete failed: $e'),
+                        backgroundColor: theme.colorScheme.error,
+                      ),
+                    );
+                  }
+                }
               }
             },
           ),
@@ -126,7 +206,9 @@ class SettingsScreen extends ConsumerWidget {
             child: Text(
               'Meridian v1.0.0',
               style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                color: theme.colorScheme.onSurfaceVariant.withValues(
+                  alpha: 0.5,
+                ),
                 letterSpacing: 2.0,
               ),
             ),
@@ -143,21 +225,27 @@ class SettingsScreen extends ConsumerWidget {
       child: Text(
         title.toUpperCase(),
         style: theme.textTheme.labelLarge?.copyWith(
-              fontWeight: FontWeight.w800,
-              letterSpacing: 1.5,
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
+          fontWeight: FontWeight.w800,
+          letterSpacing: 1.5,
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
       ),
     );
   }
 
-  Widget _buildThemeCard(BuildContext context, WidgetRef ref, ThemeMode currentMode) {
+  Widget _buildThemeCard(
+    BuildContext context,
+    WidgetRef ref,
+    ThemeMode currentMode,
+  ) {
     final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
+        border: Border.all(
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+        ),
       ),
       child: Column(
         children: [
@@ -169,7 +257,11 @@ class SettingsScreen extends ConsumerWidget {
             icon: Icons.settings_brightness_rounded,
             label: 'System Default',
           ),
-          Divider(height: 1, color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5), indent: 56),
+          Divider(
+            height: 1,
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+            indent: 56,
+          ),
           _buildThemeOption(
             context,
             ref,
@@ -178,7 +270,11 @@ class SettingsScreen extends ConsumerWidget {
             icon: Icons.light_mode_rounded,
             label: 'Light Mode',
           ),
-          Divider(height: 1, color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5), indent: 56),
+          Divider(
+            height: 1,
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+            indent: 56,
+          ),
           _buildThemeOption(
             context,
             ref,
@@ -203,7 +299,7 @@ class SettingsScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final isSelected = mode == currentMode;
     return InkWell(
-      onTap: () => ref.read(themeModeProvider.notifier).state = mode,
+      onTap: () => ref.read(themeModeProvider.notifier).setThemeMode(mode),
       borderRadius: BorderRadius.circular(24),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -212,7 +308,9 @@ class SettingsScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: isSelected ? theme.colorScheme.primary.withValues(alpha: 0.1) : Colors.transparent,
+                color: isSelected
+                    ? theme.colorScheme.primary.withValues(alpha: 0.1)
+                    : Colors.transparent,
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -228,11 +326,11 @@ class SettingsScreen extends ConsumerWidget {
               child: Text(
                 label,
                 style: theme.textTheme.bodyLarge?.copyWith(
-                      color: isSelected
-                          ? theme.colorScheme.primary
-                          : theme.colorScheme.onSurface,
-                      fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
-                    ),
+                  color: isSelected
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurface,
+                  fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
+                ),
               ),
             ),
             if (isSelected)
@@ -261,7 +359,9 @@ class SettingsScreen extends ConsumerWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
+        border: Border.all(
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+        ),
       ),
       child: InkWell(
         onTap: onTap,
@@ -273,7 +373,9 @@ class SettingsScreen extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: (iconColor ?? theme.colorScheme.primary).withValues(alpha: 0.1),
+                  color: (iconColor ?? theme.colorScheme.primary).withValues(
+                    alpha: 0.1,
+                  ),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(
@@ -290,9 +392,9 @@ class SettingsScreen extends ConsumerWidget {
                     Text(
                       title,
                       style: theme.textTheme.titleMedium?.copyWith(
-                            color: textColor ?? theme.colorScheme.onSurface,
-                            fontWeight: FontWeight.w700,
-                          ),
+                        color: textColor ?? theme.colorScheme.onSurface,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                     const SizedBox(height: 2),
                     Text(
@@ -306,7 +408,9 @@ class SettingsScreen extends ConsumerWidget {
               ),
               Icon(
                 Icons.chevron_right_rounded,
-                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+                color: theme.colorScheme.onSurfaceVariant.withValues(
+                  alpha: 0.4,
+                ),
               ),
             ],
           ),
@@ -335,7 +439,9 @@ class SettingsScreen extends ConsumerWidget {
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: isDestructive
-                ? TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.error)
+                ? TextButton.styleFrom(
+                    foregroundColor: Theme.of(context).colorScheme.error,
+                  )
                 : null,
             child: Text(confirmLabel),
           ),

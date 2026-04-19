@@ -3,10 +3,13 @@ import 'package:flutter_riverpod/legacy.dart';
 import '../../data/models/briefing_model.dart';
 import '../../data/repositories/briefing_repository.dart';
 
-final briefingProvider = StateNotifierProvider<BriefingController, AsyncValue<BriefingModel?>>((ref) {
-  final repository = ref.watch(briefingRepositoryProvider);
-  return BriefingController(repository);
-});
+final briefingProvider =
+    StateNotifierProvider<BriefingController, AsyncValue<BriefingModel?>>((
+      ref,
+    ) {
+      final repository = ref.watch(briefingRepositoryProvider);
+      return BriefingController(repository);
+    });
 
 class BriefingController extends StateNotifier<AsyncValue<BriefingModel?>> {
   final BriefingRepository _repository;
@@ -39,7 +42,7 @@ class BriefingController extends StateNotifier<AsyncValue<BriefingModel?>> {
     try {
       await _repository.dismissBriefing(id);
       await loadBriefing();
-    } catch (e) {
+    } on Exception {
       // Log error but don't disrupt the view
     }
   }

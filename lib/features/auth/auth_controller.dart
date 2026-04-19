@@ -29,10 +29,29 @@ class AuthController {
 
   Future<void> signInWithEmail(String email, String password) async {
     await _client.auth.signInWithPassword(email: email, password: password);
+
+    // Ensure user record exists (handles edge cases)
+    final user = _client.auth.currentUser;
+    if (user != null) {
+      final existingUser = await _client
+          .from('users')
+          .select()
+          .eq('id', user.id)
+          .maybeSingle();
+      if (existingUser == null) {
+        await _client.from('users').insert({'id': user.id, 'email': email});
+      }
+    }
   }
 
   Future<void> signUpWithEmail(String email, String password) async {
     await _client.auth.signUp(email: email, password: password);
+
+    // Get the newly created user and create a profile record
+    final user = _client.auth.currentUser;
+    if (user != null) {
+      await _client.from('users').insert({'id': user.id, 'email': email});
+    }
   }
 
   Future<void> signInWithGoogle() async {
@@ -40,6 +59,22 @@ class AuthController {
       OAuthProvider.google,
       redirectTo: 'io.supabase.meridian://login-callback/',
     );
+
+    // Create user record if not exists (needed after OAuth sign-in)
+    final user = _client.auth.currentUser;
+    if (user != null) {
+      final existingUser = await _client
+          .from('users')
+          .select()
+          .eq('id', user.id)
+          .maybeSingle();
+      if (existingUser == null) {
+        await _client.from('users').insert({
+          'id': user.id,
+          'email': user.email,
+        });
+      }
+    }
   }
 
   Future<void> signOut() async {

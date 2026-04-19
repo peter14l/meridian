@@ -16,7 +16,7 @@ We will create multiple components following a structured phased approach.
 - [x] Initialize Supabase project (Auth, Postgres).
 - [x] Create core DB schema: `users`, `courses`, `goals`, `tasks`.
 - [x] Implement Supabase Auth (Email/Password).
-- [ ] Implement Google OAuth (F-01). -> **Logic missing in AuthController**
+- [x] Implement Google OAuth (F-01). ✅ DONE
 - [x] Build basic Onboarding wizard (Select college, year, goals) (F-01).
 - [x] Build Task management frontend (Add/Edit task, Kanban-lite view).
 
@@ -24,18 +24,18 @@ We will create multiple components following a structured phased approach.
 
 ### Phase 2: AI & Primary Workflows (v0.5.0)
 - [x] Create `daily_briefings`, `job_applications`, `saved_items` tables.
-- [ ] Integrate Claude API in Supabase Edge Functions. -> **Currently mocked**
-- [ ] Develop `generate-briefing` Edge Function. -> **Currently mocked & lacks full context integration**
+- [x] Integrate Gemini API in Supabase Edge Functions. ✅ DONE (replaced Claude with Gemini)
+- [x] Develop `generate-briefing` Edge Function. ✅ DONE
 - [x] Build Daily Context/Briefing Home Screen with Gradient Glow UI.
-- [ ] Develop `tag-saved-item` Edge Function for Smart Capture. -> **Currently mocked**
+- [x] Develop `tag-saved-item` Edge Function for Smart Capture. ✅ DONE
 - [x] Build minimalist Browser Extension (Vanilla JS + Manifest V3).
-- [ ] Build Smart Capture Library (In-App) (F-04). -> **UI & Repository missing**
-- [ ] Implement Smart Capture in-app tagging and goal suggestions (F-04).
+- [x] Build Smart Capture Library (In-App) (F-04). ✅ DONE
+- [x] Implement Smart Capture in-app tagging and goal suggestions (F-04). ✅ DONE
 - [x] Build Job Tracker frontend (Pipeline view, Add/Edit).
-- [ ] Develop AI Email Drafter Edge Function (`draft-email`). -> **Currently mocked**
+- [x] Develop AI Email Drafter Edge Function (`draft-email`). ✅ DONE
 - [x] Integrate AI Email Drafter UI in Job Tracker (F-05).
-- [ ] Implement AI Follow-up Reminders in Job Tracker (F-05).
-- [ ] Implement Job Tracker Summary Stats (Total applied, response rate, etc.) (F-05).
+- [x] Implement AI Follow-up Reminders in Job Tracker (F-05). ✅ DONE
+- [x] Implement Job Tracker Summary Stats (Total applied, response rate, etc.) (F-05). ✅ DONE
 
 ---
 
@@ -44,8 +44,8 @@ We will create multiple components following a structured phased approach.
 - [x] Implement Google Calendar event sync to tasks with keyword auto-import (F-03).
 - [x] Refine micro-motion UI (Shared element transitions, spring bottom sheets).
 - [x] Build Core Settings & Preferences (Dark/Light toggle, Notification prefs).
-- [ ] Add Course Management to Settings (F-06). -> **UI exists, logic missing**
-- [ ] Add Data Export/Account Deletion to Settings (F-06). -> **UI exists, logic missing**
+- [x] Add Course Management to Settings (F-06). ✅ DONE
+- [x] Add Data Export/Account Deletion to Settings (F-06). ✅ DONE
 - [x] Set up Error Monitoring (Sentry) and Analytics (PostHog).
 - [x] Configure GitHub Actions for CI/CD.
 - [x] Build `ShimmerLoader` for AI components (F-02, PRD Motion section).
@@ -54,26 +54,26 @@ We will create multiple components following a structured phased approach.
 ---
 
 ### Phase 4: Secondary Core Features (v1.1.0)
-- [ ] Implement AI Study Session Planner algorithm and UI (F-07). -> **UI exists, logic missing**
+- [ ] Implement AI Study Session Planner algorithm and UI (F-07). ⚠️ UI exists, needs edge function
 - [x] Add Pomodoro Timer with dynamic session tracking.
-- [ ] Build Resource Linker & Goal Graph UI (F-08).
-- [ ] Build Smart Inbox UI (F-09).
+- [ ] Build Resource Linker & Goal Graph UI (F-08). ⚠️ Partial (in briefing)
+- [ ] Build Smart Inbox UI (F-09). ⚠️ Gmail service exists, no UI
 - [ ] Finalize iOS bundle and deploy to App Store.
 
 ---
 
 ### Phase 5: Deepening Product Experience (v1.2.0 & v1.3.0)
 - [x] Setup `resume_versions`, `study_groups`, `study_group_members` tables.
-- [ ] Build Weekly Review & AI Reflection cards (F-11).
-- [ ] Implement Resume Vault & AI matching logic (F-12). -> **Models/Repos exist, UI missing**
-- [ ] Build Study Groups frontend & in-app messaging (F-10).
+- [ ] Build Weekly Review & AI Reflection cards (F-11). ⚠️ No UI
+- [ ] Implement Resume Vault & AI matching logic (F-12). ⚠️ Backend exists, no UI
+- [x] Build Study Groups frontend & in-app messaging (F-10). ✅ DONE
 - [ ] Optimize and deploy Web App (Flutter Web).
 
 ---
 
 ### Phase 6: Advance Polish & Offline Mode (v1.4.0)
-- [x] Develop Home/Lock Screen Widgets for next deadlines.
-- [ ] Implement robust Offline Mode with local-first sync - Partial for tasks (F-17).
+- [x] Develop Home/Lock Screen Widgets for next deadlines. ⚠️ Controller exists
+- [ ] Implement robust Offline Mode with local-first sync - Partial for tasks (F-17). ⚠️ Drift exists
 - [ ] Implement Conflict Resolution (Last-write-wins) for offline sync (F-17).
 - [x] Optimize performance and conduct application profiling.
 

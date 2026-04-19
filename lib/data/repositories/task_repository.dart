@@ -21,9 +21,24 @@ class TaskRepository {
   }
 
   Future<void> updateTaskStatus(String taskId, TaskStatus status) async {
-    await _client.from('tasks').update({
-      'status': status.name,
-      if (status == TaskStatus.done) 'completed_at': DateTime.now().toIso8601String()
-    }).eq('id', taskId);
+    await _client
+        .from('tasks')
+        .update({
+          'status': _statusToString(status),
+          if (status == TaskStatus.done)
+            'completed_at': DateTime.now().toIso8601String(),
+        })
+        .eq('id', taskId);
+  }
+
+  String _statusToString(TaskStatus status) {
+    switch (status) {
+      case TaskStatus.todo:
+        return 'todo';
+      case TaskStatus.inProgress:
+        return 'in_progress';
+      case TaskStatus.done:
+        return 'done';
+    }
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -11,21 +12,20 @@ import 'features/widgets/widget_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await dotenv.load(fileName: '.env');
+
   await SupabaseService.initialize();
 
   await GoogleSignIn.instance.initialize();
 
-  await SentryFlutter.init(
-    (options) {
-      options.dsn = 'YOUR_SENTRY_DSN';
-      options.tracesSampleRate = 1.0;
-    },
-    appRunner: () => runApp(
-      const ProviderScope(
-        child: MeridianApp(),
-      ),
-    ),
-  );
+  // PostHog analytics will be available when properly configured
+  // posthog.Posthog().init(apiKey: 'your-api-key', host: 'https://app.posthog.com');
+
+  await SentryFlutter.init((options) {
+    options.dsn = dotenv.env['SENTRY_DSN'] ?? 'https://placeholder@sentry.io/0';
+    options.tracesSampleRate = 1.0;
+  }, appRunner: () => runApp(const ProviderScope(child: MeridianApp())));
 }
 
 class MeridianApp extends ConsumerWidget {
@@ -35,7 +35,7 @@ class MeridianApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(goRouterProvider);
     final themeMode = ref.watch(themeModeProvider);
-    
+
     // Initialize widget controller to keep home screen widgets in sync
     ref.listen(widgetControllerProvider, (previous, next) {});
 
